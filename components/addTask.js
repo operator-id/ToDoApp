@@ -4,25 +4,29 @@ import {
   View,
   TextInput,
   Button,
+  Text,
   TouchableOpacity,
+  Keyboard,
 } from 'react-native';
 
 export default function AddTask({submitHandler}) {
   const [taskText, setTaskText] = useState('');
 
+  const addTaskPressed = () => {
+    console.log('Pressed submit with text' + taskText);
+    submitHandler(taskText);
+    Keyboard.dismiss;
+  };
   return (
     <View>
       <TextInput
         style={styles.input}
         placeholder="new todo..."
-        setTaskText={(text) => setTaskText(text)}
-        taskText={taskText}
+        onChangeText={(text) => setTaskText(text)}
       />
-      <TouchableOpacity
-        style={styles.item}
-        onPress={console.log('Pressed submit with text' + taskText)}
-        title="add todo"
-      />
+      <View>
+        <Button style={styles.item} onPress={addTaskPressed} title="Add task" />
+      </View>
     </View>
   );
 }
@@ -36,11 +40,11 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ddd',
   },
   item: {
+    zIndex: 1,
     padding: 16,
     marginTop: 16,
     borderColor: '#21b',
     borderWidth: 1,
-    borderStyle: 'dashed',
     borderRadius: 1,
   },
 });

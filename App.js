@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   Text,
@@ -14,18 +14,27 @@ import Task from './components/task';
 import AddTask from './components/addTask';
 
 export default function App() {
-  const [todos, setTodos] = useState([
-    {text: 'drink coffee', key: '1'},
-    {text: 'create an app', key: '2'},
-    {text: 'play doto', key: '3'},
-    {text: 'drink coffee', key: '4'},
-    {text: 'create an app', key: '5'},
-    {text: 'play doto', key: '6'},
-    {text: 'drink coffee', key: '7'},
-    {text: 'create an app', key: '8'},
-    {text: 'play doto', key: '9'},
-  ]);
-  const [pressed, isPressed] = useState(false);
+  // id, name, details, date, done
+  const [todos, setTodos] = useState([]);
+
+  useEffect(() => {
+    fetch('http://10.0.2.2:9876/api/v1/items')
+      .then((response) => response.json())
+      .then((json) => setTodos(json))
+      .catch((error) => console.error(error));
+      console.log(todos);
+  }, []);
+
+  const getTasksFromApiAsync = async () => {
+    try {
+      let response = await fetch('http://10.0.2.2:9876/api/v1/items');
+      let json = await response.json();
+      console.log(json);
+      return json.movies;
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const submitHandler = (text) => {
     if (text.length > 3) {
@@ -38,7 +47,6 @@ export default function App() {
   };
   function deletePressHandler(key) {
     setTodos((prevTodos) => {
-      isPressed(!pressed);
       return prevTodos.filter((todo) => todo.key !== key);
     });
   }
@@ -53,6 +61,7 @@ export default function App() {
           <View style={styles.list}>
             <FlatList
               data={todos}
+              keyExtractor={({id}, index) => id}
               renderItem={({item}) => (
                 <Task deletePressHandler={deletePressHandler} item={item} />
               )}

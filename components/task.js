@@ -12,8 +12,10 @@ export default function Task({deletePressHandler, item}) {
   return (
     <TouchableOpacity onPress={onTaskPress}>
       <View>
-        <Text style={styles.item}>{item.text}</Text>
-        <Text>Done:{count}</Text>
+        <Text style={styles.item}>{item.name}</Text>
+        <Text style={styles.details}>{item.details}</Text>
+        <Text style={styles.details}>{item.date}</Text>
+        <Text>{item.done === 1 ? 'Done' : 'Not Done'}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -27,5 +29,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderStyle: 'dashed',
     borderRadius: 1,
+  },
+  details: {
+    marginTop: 2,
+    backgroundColor: '#f1d7a5',
   },
 });
