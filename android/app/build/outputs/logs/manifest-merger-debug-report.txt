@@ -8,6 +8,7 @@ MERGED from C:\Users\L440\ToDoApp\android\app\src\main\AndroidManifest.xml:1:1-2
 MERGED from [com.facebook.flipper:flipper:0.54.0] C:\Users\L440\.gradle\caches\transforms-2\files-2.1\1c7787ec82631e0394972c76bdabe608\flipper-0.54.0\AndroidManifest.xml:8:1-18:12
 MERGED from [com.facebook.flipper:flipper-network-plugin:0.54.0] C:\Users\L440\.gradle\caches\transforms-2\files-2.1\bd2cab46fd45b530a274001375333ead\flipper-network-plugin-0.54.0\AndroidManifest.xml:8:1-15:12
 MERGED from [com.facebook.flipper:flipper-fresco-plugin:0.54.0] C:\Users\L440\.gradle\caches\transforms-2\files-2.1\dd7dfafbb0af41b4347f18654ea5c436\flipper-fresco-plugin-0.54.0\AndroidManifest.xml:8:1-15:12
+MERGED from [:react-native-vector-icons] C:\Users\L440\ToDoApp\node_modules\react-native-vector-icons\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:2:1-11:12
 MERGED from [com.facebook.react:react-native:0.63.3] C:\Users\L440\.gradle\caches\transforms-2\files-2.1\cfa1844d999ab84ee51dd107fdec5900\jetified-react-native-0.63.3\AndroidManifest.xml:2:1-13:12
 MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] C:\Users\L440\.gradle\caches\transforms-2\files-2.1\37b6f551bc5ae153b0b627de8f563815\swiperefreshlayout-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [org.webkit:android-jsc:r245459] C:\Users\L440\.gradle\caches\transforms-2\files-2.1\6dd6245206e34676e1ee3aa6ee0f68c9\android-jsc-r245459\AndroidManifest.xml:2:1-11:12
@@ -148,6 +149,8 @@ MERGED from [com.facebook.flipper:flipper-network-plugin:0.54.0] C:\Users\L440\.
 MERGED from [com.facebook.flipper:flipper-network-plugin:0.54.0] C:\Users\L440\.gradle\caches\transforms-2\files-2.1\bd2cab46fd45b530a274001375333ead\flipper-network-plugin-0.54.0\AndroidManifest.xml:11:5-13:41
 MERGED from [com.facebook.flipper:flipper-fresco-plugin:0.54.0] C:\Users\L440\.gradle\caches\transforms-2\files-2.1\dd7dfafbb0af41b4347f18654ea5c436\flipper-fresco-plugin-0.54.0\AndroidManifest.xml:11:5-13:41
 MERGED from [com.facebook.flipper:flipper-fresco-plugin:0.54.0] C:\Users\L440\.gradle\caches\transforms-2\files-2.1\dd7dfafbb0af41b4347f18654ea5c436\flipper-fresco-plugin-0.54.0\AndroidManifest.xml:11:5-13:41
+MERGED from [:react-native-vector-icons] C:\Users\L440\ToDoApp\node_modules\react-native-vector-icons\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
+MERGED from [:react-native-vector-icons] C:\Users\L440\ToDoApp\node_modules\react-native-vector-icons\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
 MERGED from [com.facebook.react:react-native:0.63.3] C:\Users\L440\.gradle\caches\transforms-2\files-2.1\cfa1844d999ab84ee51dd107fdec5900\jetified-react-native-0.63.3\AndroidManifest.xml:7:5-9:41
 MERGED from [com.facebook.react:react-native:0.63.3] C:\Users\L440\.gradle\caches\transforms-2\files-2.1\cfa1844d999ab84ee51dd107fdec5900\jetified-react-native-0.63.3\AndroidManifest.xml:7:5-9:41
 MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] C:\Users\L440\.gradle\caches\transforms-2\files-2.1\37b6f551bc5ae153b0b627de8f563815\swiperefreshlayout-1.0.0\AndroidManifest.xml:20:5-44

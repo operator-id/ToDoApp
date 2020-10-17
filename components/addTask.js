@@ -10,22 +10,31 @@ import {
 } from 'react-native';
 
 export default function AddTask({submitHandler}) {
-  const [taskText, setTaskText] = useState('');
+  const [taskName, setTaskName] = useState('');
+  const [taskDetails, setTaskDetails] = useState('');
 
   const addTaskPressed = () => {
-    console.log('Pressed submit with text' + taskText);
-    submitHandler(taskText);
-    Keyboard.dismiss;
+    submitHandler(taskName, taskDetails);
+    Keyboard.dismiss();
   };
   return (
     <View>
       <TextInput
         style={styles.input}
-        placeholder="new todo..."
-        onChangeText={(text) => setTaskText(text)}
+        placeholder="new task ..."
+        onChangeText={(text) => setTaskName(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="task details"
+        onChangeText={(text) => setTaskDetails(text)}
       />
       <View>
-        <Button style={styles.item} onPress={addTaskPressed} title="Add task" />
+        <Button
+          style={styles.item}
+          onPress={() => addTaskPressed()}
+          title="Add task"
+        />
       </View>
     </View>
   );
