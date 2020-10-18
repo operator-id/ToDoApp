@@ -8,6 +8,7 @@ import {
   TouchableHighlight,
   TouchableWithoutFeedback,
   Keyboard,
+  Button,
 } from 'react-native';
 import Header from './components/header';
 import Task from './components/task';
@@ -15,41 +16,115 @@ import AddTask from './components/addTask';
 
 export default function App() {
   // id, name, details, date, done
+  let host = '';
+  const isConnected = true;
+  if (isConnected) {
+    host = 'http://172.104.202.219:8080/api/v1/';
+  } else {
+    host = 'http://10.0.2.2:8080/api/v1/';
+  }
+
   const [todos, setTodos] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(null);
+
+  const setIndex = (newIndex) => {
+    setCurrentIndex(newIndex);
+  };
+  const getIndex = () => {
+    return currentIndex;
+  };
 
   useEffect(() => {
-    fetch('http://10.0.2.2:9876/api/v1/items')
-      .then((response) => response.json())
-      .then((json) => setTodos(json))
-      .catch((error) => console.error(error));
-      console.log(todos);
+    getTasksFromApi();
   }, []);
 
-  const getTasksFromApiAsync = async () => {
+  const getTasksFromApi = async () => {
     try {
-      let response = await fetch('http://10.0.2.2:9876/api/v1/items');
+      let response = await fetch(host + 'items');
       let json = await response.json();
-      console.log(json);
-      return json.movies;
+      setTodos(json);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const submitHandler = (text) => {
-    if (text.length > 3) {
-      setTodos((prevTodos) => {
-        return [{text, key: Math.random().toString()}, ...prevTodos];
+  const sendPostRequestToApi = async (nameValue, detailsValue) => {
+    try {
+      await fetch(host + 'item', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: nameValue,
+          details: detailsValue,
+          date: checkTime(),
+        }),
       });
+    } catch (error) {
+      console.error();
+    }
+  };
+  const sendModifyRequestToApi = async (id) => {
+    try {
+      await fetch(host + 'item/' + id, {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: 'nameValue',
+          details: 'detailsValue',
+        }),
+      });
+
+      console.log('attempt to modify task with id ' + id + ' ...');
+    } catch (error) {
+      console.error();
+    }
+  };
+  const sendDeleteRequestToApi = async (id) => {
+    try {
+      await fetch(host + 'item/' + id, {
+        method: 'DELETE',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('attempt to delete task with id ' + id + ' ...');
+    } catch (error) {
+      console.error();
+    }
+  };
+
+  const submitHandler = (taskName, taskDetails) => {
+    if (taskName.length > 3) {
+      sendPostRequestToApi(taskName, taskDetails);
+      getTasksFromApi();
     } else {
       console.log('text too short !');
     }
   };
   function deletePressHandler(key) {
-    setTodos((prevTodos) => {
-      return prevTodos.filter((todo) => todo.key !== key);
-    });
+    sendDeleteRequestToApi(key);
+    getTasksFromApi();
   }
+
+  const checkTime = () => {
+    var date = new Date().getDate(); //Current Date
+    var month = new Date().getMonth() + 1; //Current Month
+    var year = new Date().getFullYear(); //Current Year
+    var hours = new Date().getHours(); //Current Hours
+    var min = new Date().getMinutes(); //Current Minutes
+    var sec = new Date().getSeconds(); //Current Seconds
+    return (
+      date + '/' + month + '/' + year + ' ' + hours + ':' + min + ':' + sec
+    );
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -58,12 +133,24 @@ export default function App() {
         <View style={styles.content}>
           {/* add todo form */}
           <AddTask submitHandler={submitHandler} />
+          <Button
+            title="Modify Task"
+            onPress={() => {
+              sendModifyRequestToApi(58);
+              getTasksFromApi();
+            }}
+          />
           <View style={styles.list}>
             <FlatList
               data={todos}
-              keyExtractor={({id}, index) => id}
+              keyExtractor={({id}, index) => id.toString()}
               renderItem={({item}) => (
-                <Task deletePressHandler={deletePressHandler} item={item} />
+                <Task
+                  deletePressHandler={deletePressHandler}
+                  item={item}
+                  getIndex={getIndex}
+                  setIndex={setIndex}
+                />
               )}
             />
           </View>
