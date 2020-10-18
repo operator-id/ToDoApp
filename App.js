@@ -8,6 +8,7 @@ import {
   TouchableHighlight,
   TouchableWithoutFeedback,
   Keyboard,
+  Button,
 } from 'react-native';
 import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
@@ -15,10 +16,12 @@ import {createStackNavigator} from '@react-navigation/stack';
 import Header from './components/header';
 import Task from './components/task';
 import AddTask from './components/addTask';
+import {TaskScreen} from './components/task';
+import Api from './components/apiUtil';
 
 const Stack = createStackNavigator();
 
-export default function App() {
+export function HomeScreen({navigation}){
   // id, name, details, date, done
   let host = '';
   const isConnected = true;
@@ -39,9 +42,10 @@ export default function App() {
   };
 
   useEffect(() => {
-    getTasksFromApi();
+      getTasksFromApi();
   }, []);
 
+  
   const getTasksFromApi = async () => {
     try {
       let response = await fetch(host + 'items');
@@ -51,7 +55,6 @@ export default function App() {
       console.error(error);
     }
   };
-
   const sendPostRequestToApi = async (nameValue, detailsValue) => {
     try {
       await fetch(host + 'item', {
@@ -123,10 +126,10 @@ export default function App() {
       console.log('text too short !');
     }
   };
-  function deletePressHandler(key) {
+  const handleDelete = (key) => {
     sendDeleteRequestToApi(key);
     getTasksFromApi();
-  }
+  };
   const handleModify = (id, name, description, done) => {
     sendModifyRequestToApi(id, name, description, done);
     getTasksFromApi();
@@ -143,32 +146,43 @@ export default function App() {
       date + '/' + month + '/' + year + ' ' + hours + ':' + min + ':' + sec
     );
   };
+    return (
+
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+          <View style={styles.container}>
+            <Header />
+            <View style={styles.content}>
+              <AddTask submitHandler={submitHandler} />
+              <View style={styles.list}></View>
+                <FlatList
+                  data={todos}
+                  keyExtractor={({id}, index) => id.toString()}
+                  renderItem={({item}) => (
+                    <Task
+                      handleDelete={handleDelete}
+                      item={item}
+                      getIndex={getIndex}
+                      setIndex={setIndex}
+                      handleModify={handleModify}
+                    />
+                  )}
+                />
+              </View>
+            </View>
+         
+        </TouchableWithoutFeedback>
+    );
+}
+
+
+export default function App() {
 
   return (
     <NavigationContainer>
-      <TouchableWithoutFeedback>
-        <View style={styles.container}>
-          <Header />
-          <View style={styles.content}>
-            <AddTask submitHandler={submitHandler} />
-            <View style={styles.list}>
-              <FlatList
-                data={todos}
-                keyExtractor={({id}, index) => id.toString()}
-                renderItem={({item}) => (
-                  <Task
-                    deletePressHandler={deletePressHandler}
-                    item={item}
-                    getIndex={getIndex}
-                    setIndex={setIndex}
-                    handleModify={handleModify}
-                  />
-                )}
-              />
-            </View>
-          </View>
-        </View>
-      </TouchableWithoutFeedback>
+      <Stack.Navigator>
+        <Stack.Screen name="All tasks" component={HomeScreen} />
+        <Stack.Screen name="Edit task" component={TaskScreen} />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
