@@ -1,18 +1,22 @@
+/* eslint-disable prettier/prettier */
 import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   Text,
-  Alert,
   View,
   FlatList,
   TouchableHighlight,
   TouchableWithoutFeedback,
   Keyboard,
-  Button,
 } from 'react-native';
+import 'react-native-gesture-handler';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
 import Header from './components/header';
 import Task from './components/task';
 import AddTask from './components/addTask';
+
+const Stack = createStackNavigator();
 
 export default function App() {
   // id, name, details, date, done
@@ -66,7 +70,12 @@ export default function App() {
       console.error();
     }
   };
-  const sendModifyRequestToApi = async (id) => {
+  const sendModifyRequestToApi = async (
+    id,
+    taskName,
+    taskDetails,
+    taskDone,
+  ) => {
     try {
       await fetch(host + 'item/' + id, {
         method: 'PUT',
@@ -75,12 +84,16 @@ export default function App() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: 'nameValue',
-          details: 'detailsValue',
+          name: taskName,
+          details: taskDetails,
+          done: taskDone,
         }),
       });
 
       console.log('attempt to modify task with id ' + id + ' ...');
+      console.log(
+        'new values: ' + taskName + ' ' + taskDetails + ' ' + taskDone,
+      );
     } catch (error) {
       console.error();
     }
@@ -104,6 +117,7 @@ export default function App() {
   const submitHandler = (taskName, taskDetails) => {
     if (taskName.length > 3) {
       sendPostRequestToApi(taskName, taskDetails);
+
       getTasksFromApi();
     } else {
       console.log('text too short !');
@@ -113,6 +127,10 @@ export default function App() {
     sendDeleteRequestToApi(key);
     getTasksFromApi();
   }
+  const handleModify = (id, name, description, done) => {
+    sendModifyRequestToApi(id, name, description, done);
+    getTasksFromApi();
+  };
 
   const checkTime = () => {
     var date = new Date().getDate(); //Current Date
@@ -127,36 +145,31 @@ export default function App() {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
-        <Header />
-        <View style={styles.content}>
-          {/* add todo form */}
-          <AddTask submitHandler={submitHandler} />
-          <Button
-            title="Modify Task"
-            onPress={() => {
-              sendModifyRequestToApi(58);
-              getTasksFromApi();
-            }}
-          />
-          <View style={styles.list}>
-            <FlatList
-              data={todos}
-              keyExtractor={({id}, index) => id.toString()}
-              renderItem={({item}) => (
-                <Task
-                  deletePressHandler={deletePressHandler}
-                  item={item}
-                  getIndex={getIndex}
-                  setIndex={setIndex}
-                />
-              )}
-            />
+    <NavigationContainer>
+      <TouchableWithoutFeedback>
+        <View style={styles.container}>
+          <Header />
+          <View style={styles.content}>
+            <AddTask submitHandler={submitHandler} />
+            <View style={styles.list}>
+              <FlatList
+                data={todos}
+                keyExtractor={({id}, index) => id.toString()}
+                renderItem={({item}) => (
+                  <Task
+                    deletePressHandler={deletePressHandler}
+                    item={item}
+                    getIndex={getIndex}
+                    setIndex={setIndex}
+                    handleModify={handleModify}
+                  />
+                )}
+              />
+            </View>
           </View>
         </View>
-      </View>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+    </NavigationContainer>
   );
 }
 
