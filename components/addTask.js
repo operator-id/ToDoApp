@@ -7,40 +7,56 @@ import {
   Text,
   TouchableOpacity,
   Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
+import {SendPostRequestToApi} from '../App';
+export function AddTaskScreen({navigation}) {
+  const [name, setName] = useState('');
 
-export default function AddTask({submitHandler}) {
-  const [taskName, setTaskName] = useState('');
-  const [taskDetails, setTaskDetails] = useState('');
+  const [details, setDetails] = useState('');
+  const [warning, setWarning] = useState('');
 
-  const addTaskPressed = () => {
-    submitHandler(taskName, taskDetails);
-    Keyboard.dismiss();
+  const checkInputsIfCorrect = (taskName) => {
+    return taskName.length > 0;
   };
+
   return (
-    <View>
-      <TextInput
-        style={styles.input}
-        placeholder="new task ..."
-        onChangeText={(text) => setTaskName(text)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="task details"
-        onChangeText={(text) => setTaskDetails(text)}
-      />
+    <TouchableWithoutFeedback
+      style={{flex: 1, marginTop: 20}}
+      onPress={() => Keyboard.dismiss()}>
       <View>
-        <Button
-          style={styles.item}
-          onPress={() => addTaskPressed()}
-          title="Add task"
+        <TextInput
+          style={styles.input}
+          placeholder="Task name"
+          onChangeText={(text) => setName(text)}
         />
+        <TextInput
+          style={styles.input}
+          multiline={true}
+          placeholder="Some details..."
+          onChangeText={(text) => setDetails(text)}
+        />
+        <View styles={styles.taskGeneric}>
+          <Button
+            title="Add"
+            style={styles.deleteButton}
+            onPress={() => {
+              if (checkInputsIfCorrect(name)) {
+                SendPostRequestToApi(name, details);
+                navigation.goBack();
+              } else {
+                setWarning('Please fill in task name');
+              }
+            }}
+          />
+          <Text>{warning}</Text>
+        </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   input: {
     marginBottom: 10,
     paddingHorizontal: 8,

@@ -1,46 +1,64 @@
 import React from 'react';
-import {StyleSheet, TouchableOpacity, Text, View, Button} from 'react-native';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  View,
+  Button,
+  TextInput,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import {useIsFocused} from '@react-navigation/core';
 import {useNavigation} from '@react-navigation/native';
-import {HomeScreen} from '../App';
+import {styles as InputStyles} from './addTask';
+import {
+  HandleDelete,
+  SendModifyRequestToApi,
+  SendDeleteRequestToApi,
+} from '../App';
 
 export function TaskScreen({navigation, route}) {
-  const isFocused = useIsFocused();
   let item = route.params.item;
   console.log('showing modify screen for item with id: ' + item.id);
   return (
-    <View>
-      <Text style={{color: isFocused ? 'green' : 'black'}}>SettingsScreen</Text>
-      <TouchableOpacity>
-        <View>
-          <Text>{item.name}</Text>
-          <Text style={styles.details}>{item.details}</Text>
-          <Text style={styles.details}>{item.date}</Text>
+    <TouchableWithoutFeedback style={{flex:1, marginTop:20 }} onPress={()=>Keyboard.dismiss()}>
+      <View>
+        <TextInput 
+
+          style={InputStyles.input}
+          defaultValue={item.name}
+          onChangeText={(text) => (item.name = text)}
+        />
+        <TextInput
+          style={InputStyles.input}
+          multiline={true}
+          defaultValue={item.details}
+          onChangeText={(text) => (item.details = text)}
+        />
+        <View styles={styles.taskGeneric}>
+          <Button
+            title="Save"
+            style={styles.deleteButton}
+            onPress={() => {
+              SendModifyRequestToApi(item);
+            }}
+          />
+          <Button
+            title="Delete"
+            style={styles.deleteButton}
+            onPress={() => {
+              SendDeleteRequestToApi(item.id);
+              navigation.goBack();
+            }}
+          />
         </View>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={() => {
-          HomeScreen.handleDelete(item.id);
-          navigation.goBack();
-        }}>
-        <Text>Delete</Text>
-      </TouchableOpacity>
-    </View>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
-export default function Task({
-  deletePressHandler,
-  item,
-  getIndex,
-  setIndex,
-  handleModify,
-}) {
-  const onDeletePress = () => {
-    console.log('in task ' + item.id);
-    deletePressHandler(item.id);
-  };
+export default function Task({item}) {
   const navigation = useNavigation();
 
   return (
@@ -51,9 +69,10 @@ export default function Task({
         <View style={styles.taskGeneric}>
           <CheckBox
             value={item.done}
-            onValueChange={(newValue) =>
-              handleModify(item.id, item.name, item.details, newValue)
-            }
+            onValueChange={(newValue) => {
+              item.done = newValue;
+              SendModifyRequestToApi(item);
+            }}
           />
           <Text>{item.name}</Text>
         </View>
@@ -64,6 +83,7 @@ export default function Task({
 
 const styles = StyleSheet.create({
   taskGeneric: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -81,7 +101,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f1d7a5',
   },
   deleteButton: {
-    alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#b22f',
   },

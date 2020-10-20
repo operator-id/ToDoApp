@@ -17,91 +17,12 @@ import Header from './components/header';
 import Task from './components/task';
 import AddTask from './components/addTask';
 import {TaskScreen} from './components/task';
-import Api from './components/apiUtil';
+import {AddTaskScreen} from './components/addTask';
 
 const Stack = createStackNavigator();
+const host =  'http://172.104.202.219:8080/api/v1/';
 
-export function HomeScreen({navigation}){
-  // id, name, details, date, done
-  let host = '';
-  const isConnected = true;
-  if (isConnected) {
-    host = 'http://172.104.202.219:8080/api/v1/';
-  } else {
-    host = 'http://10.0.2.2:8080/api/v1/';
-  }
-
-  const [todos, setTodos] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(null);
-
-  const setIndex = (newIndex) => {
-    setCurrentIndex(newIndex);
-  };
-  const getIndex = () => {
-    return currentIndex;
-  };
-
-  useEffect(() => {
-      getTasksFromApi();
-  }, []);
-
-  
-  const getTasksFromApi = async () => {
-    try {
-      let response = await fetch(host + 'items');
-      let json = await response.json();
-      setTodos(json);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  const sendPostRequestToApi = async (nameValue, detailsValue) => {
-    try {
-      await fetch(host + 'item', {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: nameValue,
-          details: detailsValue,
-          date: checkTime(),
-        }),
-      });
-    } catch (error) {
-      console.error();
-    }
-  };
-  const sendModifyRequestToApi = async (
-    id,
-    taskName,
-    taskDetails,
-    taskDone,
-  ) => {
-    try {
-      await fetch(host + 'item/' + id, {
-        method: 'PUT',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: taskName,
-          details: taskDetails,
-          done: taskDone,
-        }),
-      });
-
-      console.log('attempt to modify task with id ' + id + ' ...');
-      console.log(
-        'new values: ' + taskName + ' ' + taskDetails + ' ' + taskDone,
-      );
-    } catch (error) {
-      console.error();
-    }
-  };
-  const sendDeleteRequestToApi = async (id) => {
+export const SendDeleteRequestToApi = async (id) => {
     try {
       await fetch(host + 'item/' + id, {
         method: 'DELETE',
@@ -116,26 +37,47 @@ export function HomeScreen({navigation}){
       console.error();
     }
   };
+  export const SendPostRequestToApi = async (nameValue, detailsValue) => {
+      try {
+        await fetch(host + 'item', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: nameValue,
+            details: detailsValue,
+            date: GetTime(),
+          }),
+        });
+      } catch (error) {
+        console.error();
+      }
+    };
+  export const SendModifyRequestToApi = async (
+item
+    ) => {
+      try {
+        await fetch(host + 'item/' + item.id, {
+          method: 'PUT',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: item.name,
+            details: item.details,
+            done: item.done,
+          }),
+        });
 
-  const submitHandler = (taskName, taskDetails) => {
-    if (taskName.length > 3) {
-      sendPostRequestToApi(taskName, taskDetails);
-
-      getTasksFromApi();
-    } else {
-      console.log('text too short !');
-    }
-  };
-  const handleDelete = (key) => {
-    sendDeleteRequestToApi(key);
-    getTasksFromApi();
-  };
-  const handleModify = (id, name, description, done) => {
-    sendModifyRequestToApi(id, name, description, done);
-    getTasksFromApi();
-  };
-
-  const checkTime = () => {
+        console.log('attempt to modify task with id ' + item.id + ' ...');
+      } catch (error) {
+        console.error();
+      }
+    };
+  const GetTime = () => {
     var date = new Date().getDate(); //Current Date
     var month = new Date().getMonth() + 1; //Current Month
     var year = new Date().getFullYear(); //Current Year
@@ -146,31 +88,52 @@ export function HomeScreen({navigation}){
       date + '/' + month + '/' + year + ' ' + hours + ':' + min + ':' + sec
     );
   };
-    return (
 
-        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-          <View style={styles.container}>
-            <Header />
-            <View style={styles.content}>
-              <AddTask submitHandler={submitHandler} />
-              <View style={styles.list}></View>
-                <FlatList
-                  data={todos}
-                  keyExtractor={({id}, index) => id.toString()}
-                  renderItem={({item}) => (
-                    <Task
-                      handleDelete={handleDelete}
-                      item={item}
-                      getIndex={getIndex}
-                      setIndex={setIndex}
-                      handleModify={handleModify}
-                    />
-                  )}
-                />
-              </View>
-            </View>
-         
-        </TouchableWithoutFeedback>
+export function HomeScreen({navigation}){
+  // id, name, details, date, done
+
+  const [todos, setTodos] = useState([]);
+  const fetchTasks = async () =>{
+          try  {
+        let response = await fetch(host + 'items');
+        let json = await response.json();
+        console.log('fetching tasks...');
+        setTodos(json);
+      } catch (error) {
+        console.error(error);
+      }}
+  useEffect(() => {
+      fetchTasks();
+  }, []);
+
+  // const submitHandler = (item) => {
+  //     setTodos(prevTodos => {
+  //       return [
+  //         { },
+  //         ...prevTodos
+  //       ];
+  //     });
+  //   }
+  //   }
+
+
+    return (
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <View style={styles.container}>
+          <View style={styles.content}>
+            <Button
+              onPress={() => navigation.navigate('Add task')}
+              title="New task"
+            />
+            <View style={styles.list}></View>
+            <FlatList
+              data={todos}
+              keyExtractor={({id}, index) => id.toString()}
+              renderItem={({item}) => <Task item={item} />}
+            />
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
     );
 }
 
@@ -182,6 +145,7 @@ export default function App() {
       <Stack.Navigator>
         <Stack.Screen name="All tasks" component={HomeScreen} />
         <Stack.Screen name="Edit task" component={TaskScreen} />
+        <Stack.Screen name="Add task" component={AddTaskScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
