@@ -9,7 +9,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
-import {SendPostRequestToApi} from '../App';
+import {SendPostRequestToApi, styles as Generic} from '../App';
 export function AddTaskScreen({navigation}) {
   const [name, setName] = useState('');
 
@@ -21,10 +21,8 @@ export function AddTaskScreen({navigation}) {
   };
 
   return (
-    <TouchableWithoutFeedback
-      style={{flex: 1, marginTop: 20}}
-      onPress={() => Keyboard.dismiss()}>
-      <View>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <View style={Generic.container}>
         <TextInput
           style={styles.input}
           placeholder="Task name"
@@ -65,7 +63,7 @@ export const styles = StyleSheet.create({
     borderBottomColor: '#ddd',
   },
   item: {
-    zIndex: 1,
+    
     padding: 16,
     marginTop: 16,
     borderColor: '#21b',

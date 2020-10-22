@@ -14,19 +14,19 @@ import {useIsFocused} from '@react-navigation/core';
 import {useNavigation} from '@react-navigation/native';
 import {styles as InputStyles} from './addTask';
 import {
-  HandleDelete,
+  styles as Generic,
   SendModifyRequestToApi,
   SendDeleteRequestToApi,
 } from '../App';
 
 export function TaskScreen({navigation, route}) {
   let item = route.params.item;
+
   console.log('showing modify screen for item with id: ' + item.id);
   return (
-    <TouchableWithoutFeedback style={{flex:1, marginTop:20 }} onPress={()=>Keyboard.dismiss()}>
-      <View>
-        <TextInput 
-
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <View style={Generic.container}>
+        <TextInput
           style={InputStyles.input}
           defaultValue={item.name}
           onChangeText={(text) => (item.name = text)}
@@ -50,7 +50,8 @@ export function TaskScreen({navigation, route}) {
             style={styles.deleteButton}
             onPress={() => {
               SendDeleteRequestToApi(item.id);
-              navigation.goBack();
+
+              navigation.navigate('All tasks', {item});
             }}
           />
         </View>
@@ -58,7 +59,7 @@ export function TaskScreen({navigation, route}) {
     </TouchableWithoutFeedback>
   );
 }
-export default function Task({item}) {
+export default function Task({item, submitHandler}) {
   const navigation = useNavigation();
 
   return (
@@ -71,7 +72,7 @@ export default function Task({item}) {
             value={item.done}
             onValueChange={(newValue) => {
               item.done = newValue;
-              SendModifyRequestToApi(item);
+              submitHandler(item);
             }}
           />
           <Text>{item.name}</Text>

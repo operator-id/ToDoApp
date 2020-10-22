@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Button,
+  ActivityIndicator,
 } from 'react-native';
 import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
@@ -21,6 +22,10 @@ import {AddTaskScreen} from './components/addTask';
 
 const Stack = createStackNavigator();
 const host =  'http://172.104.202.219:8080/api/v1/';
+
+export const Refresh = () =>{
+  window.location.reload(false);
+};
 
 export const SendDeleteRequestToApi = async (id) => {
     try {
@@ -36,6 +41,7 @@ export const SendDeleteRequestToApi = async (id) => {
     } catch (error) {
       console.error();
     }
+    Refresh();
   };
   export const SendPostRequestToApi = async (nameValue, detailsValue) => {
       try {
@@ -89,54 +95,6 @@ item
     );
   };
 
-export function HomeScreen({navigation}){
-  // id, name, details, date, done
-
-  const [todos, setTodos] = useState([]);
-  const fetchTasks = async () =>{
-          try  {
-        let response = await fetch(host + 'items');
-        let json = await response.json();
-        console.log('fetching tasks...');
-        setTodos(json);
-      } catch (error) {
-        console.error(error);
-      }}
-  useEffect(() => {
-      fetchTasks();
-  }, []);
-
-  // const submitHandler = (item) => {
-  //     setTodos(prevTodos => {
-  //       return [
-  //         { },
-  //         ...prevTodos
-  //       ];
-  //     });
-  //   }
-  //   }
-
-
-    return (
-      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <View style={styles.container}>
-          <View style={styles.content}>
-            <Button
-              onPress={() => navigation.navigate('Add task')}
-              title="New task"
-            />
-            <View style={styles.list}></View>
-            <FlatList
-              data={todos}
-              keyExtractor={({id}, index) => id.toString()}
-              renderItem={({item}) => <Task item={item} />}
-            />
-          </View>
-        </View>
-      </TouchableWithoutFeedback>
-    );
-}
-
 
 export default function App() {
 
@@ -149,9 +107,71 @@ export default function App() {
       </Stack.Navigator>
     </NavigationContainer>
   );
+  function HomeScreen({navigation, route}) {
+    // id, name, details, date, done
+    const [todos, setTodos] = useState([]);
+    const [isLoading, setLoading] = useState(true);
+    const fetchTasks = () => {
+      setLoading(true);
+      fetch(host + 'items')
+        .then((response) => response.json())
+        .then((json) => {
+          setTodos(json);
+        })
+        .catch((error) => console.error(error))
+        .finally(() => {
+          setLoading(false);
+        });
+    };
+    useEffect(() => {
+      fetchTasks();
+    }, []);
+
+    const submitHandler = (item) => {
+      SendModifyRequestToApi(item);
+      fetchTasks();
+    };
+    const deleteHandler = (id) => {
+      SendDeleteRequestToApi(id);
+      fetchTasks();
+    };
+
+    return (
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <View style={styles.container}>
+          <View style={styles.content}>
+            <Button
+              onPress={() => navigation.navigate('Add task')}
+              title="New task"
+              style={styles.button}/>
+              {isLoading ? (
+                <ActivityIndicator
+                  size="large"
+                  color="#00ff00"
+                  style={{padding: 100, flex: 1}}
+                />
+              ) : (
+                <View style={styles.list}>
+                  <FlatList
+                    data={todos}
+                    keyExtractor={({id}, index) => id.toString()}
+                    renderItem={({item}) => (
+                      <Task item={item} submitHandler={submitHandler} />
+                    )}
+                  />
+                </View>
+              )}
+ 
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  }
+
+
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   text: {
     fontSize: 16,
   },
@@ -167,7 +187,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   button: {
-    zIndex: 1,
+ 
     backgroundColor: '#dddd22',
     borderRadius: 8,
     padding: 6,
